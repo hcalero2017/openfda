@@ -1,6 +1,6 @@
 a = 1
 b = 0
-print("HEllo  from Pycharm 0")
+print("HEllo  from Pychar 0")
 print("HEllo  from Pycharm 1")
 print("HEllo  from Pycharm 2")
 
