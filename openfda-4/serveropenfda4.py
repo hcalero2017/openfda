@@ -13,7 +13,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         with open("search.html","r") as f:
-             message = f.read()
+            if self.path == "/":
+                message = f.read()
+            elif self.path =="/search":
+                message =
+            else:
+                message =
+
 
         self.wfile.write(bytes(message, "utf8"))
         print("File served")
