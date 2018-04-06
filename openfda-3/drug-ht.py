@@ -3,7 +3,7 @@
 
 import socket
 
-PORT = 8004
+PORT = 8014
 MAX_OPEN_REQUESTS = 5
 
 def process_client(clientsocket):
@@ -23,8 +23,8 @@ def process_client(clientsocket):
 
     list = []
     i = 0
-    intro = "<ol>" + "\n"
-    end = "<\ol>"
+    intro = "<!doctype html>" + "\n" + "<html>" + "\n" + "<body>" + "\n" + "<ol>" + "\n"
+    end = "</ol>" + "\n" + "</body>" + "\n" + "</html>"
 
     while i < 10:
         if 'active_ingredient' in repos['results'][i]:
@@ -37,7 +37,7 @@ def process_client(clientsocket):
     with open("drug.html","w") as f:
         f.write(intro)
         for element in list:
-            element_1 = "</t>" + "<li>" + element + "</li>"
+            element_1 = "<li>" + element + "</li>"
             f.write(element_1)
         f.write(end)
 
