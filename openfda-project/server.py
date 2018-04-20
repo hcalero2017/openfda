@@ -1,84 +1,171 @@
-# A basic web server using sockets
-
-
+import http.server
+import socketserver
+import json
+import http.client
 import socket
 
+# -- IP and the port of the server
+IP = "localhost"  # Localhost means "I": your local machine
 PORT = 8000
-MAX_OPEN_REQUESTS = 5
+socketserver.TCPServer.allow_reuse_adress = True
 
-def process_client(clientsocket):
-    import http.client
-    import json
 
-    headers = {'User-Agent': 'http-client'}
+# HTTPRequestHandler class
+class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+    # GET
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
 
-    conn = http.client.HTTPSConnection("api.fda.gov")
-    conn.request("GET", "/drug/label.json?limit=10", None, headers)
-    r1 = conn.getresponse()
-    print(r1.status, r1.reason)
-    repos_raw = r1.read().decode("utf-8")
-    conn.close()
+        intro = "<!doctype html>" + "\n" + "<html>" + "\n" + "<body>" + "\n" "<ul>" + "\n"
+        end = "</ul>" + "\n" + "</body>" + "\n" + "</html>"
 
-    repos = json.loads(repos_raw)
 
-    list = []
-    list2 = []
-    i = 0
-    intro = "<!doctype html>" + "\n" + "<html>" + "\n" + "<body>" + "\n" + "<ol>" + "\n"
-    end = "</ol>" + "\n" + "</body>" + "\n" + "</html>"
+        if self.path == "/":
+            with open("search.html", "r") as f:
+                message = f.read()
+                self.wfile.write(bytes(message, "utf8"))
 
-    while i < 10:
-        if 'active_ingredient' in repos['results'][i]:
-            list.append(repos['results'][i]['active_ingredient'][0])
-            i += 1
-        else:
-            list.append("This index has no drug")
-            i += 1
-    while i < 10:
-        if 'manufacturer_name' in repos['results'][i]:
-            list2.append(repos['results'][i]['openfda']['manufacturer_name'])
-            i += 1
-        else:
-            list2.append("This index has no manufacturer")
-            i += 1
-    with open("drug.html","w") as f:
-        f.write(intro)
-        for element in list:
-            element_1 = "<li>" + element + "</li>"
-            f.write(element_1)
-        for thing in list2:
-            element_2 = "<li>" + thing + "</li>"
-            f.write(element_2)
-        f.write(end)
-    with open("drug.html","r") as f:
-        file = f.read()
+        elif "searchDrug" in self.path:
+            list=[]
+            headers = {'User-Agent': 'http-client'}
+            conn = http.client.HTTPSConnection("api.fda.gov")
+            drug = self.path.split("?")[1]
+            print(drug)
+            url = "/drug/label.json?search=active_ingredient:" + drug
+            conn.request("GET", url, None, headers)
+            r1 = conn.getresponse()
+            drugs_raw = r1.read().decode("utf-8")
+            conn.close()
+            drug = json.loads(drugs_raw)
+            drugs_1 = drug
 
-    web_contents = file
-    web_headers = "HTTP/1.1 200"
-    web_headers += "\n" + "Content-Type: text/html"
-    web_headers += "\n" + "Content-Length: %i" % len(str.encode(web_contents))
-    clientsocket.send(str.encode(web_headers + "\n\n" + web_contents))
-    clientsocket.close()
+            for i in range(len(drugs_1['results'])):
+                if 'active_ingredient' in drugs_1['results'][i]:
+                    list.append(drugs_1['results'][i]['active_ingredient'][0])
+                else:
+                    list.append("This index has no drug")
+            with open("drug.html", "w") as f:
+                f.write(intro)
+                for element in list:
+                    element_1 = "<li>" + element + "</li>" + "\n"
+                    f.write(element_1)
+                f.write(end)
+            with open("drug.html", "r") as f:
+                file = f.read()
 
-# create an INET, STREAMing socket
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# bind the socket to a public host, and a well-known port
-hostname = socket.gethostname()
-# Let's use better the local interface name
-hostname = "localhost"
+            self.wfile.write(bytes(file, "utf8"))
+
+        elif "searchCompanies" in self.path:
+            list=[]
+            headers = {'User-Agent': 'http-client'}
+            conn = http.client.HTTPSConnection("api.fda.gov")
+            companies = self.path.split("?")[1]
+            url = "/drug/label.json?search=manufacturer_name:" + companies
+            conn.request("GET", url, None, headers)
+            r1 = conn.getresponse()
+            company_raw = r1.read().decode("utf-8")
+            conn.close()
+            companies = json.loads(company_raw)
+            companies_1 = companies
+
+            for i in range(len(companies_1['results'])):
+                if 'active_ingredient' in companies_1['results'][i]:
+                    list.append(companies_1['results'][i]['openfda']["manufacturer_name"][0])
+                else:
+                    list.append("This index has no manufacturer name")
+            with open("drug.html", "w") as f:
+                f.write(intro)
+                for element in list:
+                    element_1 = "<li>" + element + "</li>" + "\n"
+                    f.write(element_1)
+                f.write(end)
+            with open("drug.html", "r") as f:
+                file = f.read()
+
+            self.wfile.write(bytes(file, "utf8"))
+
+        elif "listDrugs" in self.path:
+            list=[]
+            headers = {'User-Agent': 'http-client'}
+            conn = http.client.HTTPSConnection("api.fda.gov")
+            drug = self.path.split("?")[1]
+            print(drug)
+            url = "/drug/label.json?" + drug
+            conn.request("GET", url, None, headers)
+            r1 = conn.getresponse()
+            drugs_raw = r1.read().decode("utf-8")
+            conn.close()
+            drug = json.loads(drugs_raw)
+            drugs_1 = drug
+
+            for i in range(len(drugs_1['results'])):
+                if "openfda" in drugs_1["results"][i]:
+                    list.append(drugs_1['results'][i]['openfda']["brand_name"][0])
+            with open("drug.html", "w") as f:
+                f.write(intro)
+                for element in list:
+                    element_1 = "<li>" + element + "</li>" + "\n"
+                    f.write(element_1)
+                f.write(end)
+            with open("drug.html", "r") as f:
+                file = f.read()
+
+            self.wfile.write(bytes(file, "utf8"))
+
+        elif "listCompanies" in self.path:
+            list = []
+            headers = {'User-Agent': 'http-client'}
+            conn = http.client.HTTPSConnection("api.fda.gov")
+            drug = self.path.split("?")[1]
+            print(drug)
+            url = "/drug/label.json?" + drug
+            conn.request("GET", url, None, headers)
+            r1 = conn.getresponse()
+            drugs_raw = r1.read().decode("utf-8")
+            conn.close()
+            drug = json.loads(drugs_raw)
+            drugs_1 = drug
+
+            for i in range(len(drugs_1['results'])):
+                if "openfda" in drugs_1["results"][i]:
+                    list.append(drugs_1['results'][i]['openfda']["manufacturer_name"][0])
+                else:
+                    list.append("Unknow")
+
+            with open("drug.html", "w") as f:
+                f.write(intro)
+                for element in list:
+                    element_1 = "<li>" + element + "</li>" + "\n"
+                    f.write(element_1)
+                f.write(end)
+            with open("drug.html", "r") as f:
+                file = f.read()
+
+            self.wfile.write(bytes(file, "utf8"))
+
+
+
+
+
+        return
+
+
+# Handler = http.server.SimpleHTTPRequestHandler
+Handler = testHTTPRequestHandler
+
+httpd = socketserver.TCPServer((IP, PORT), Handler)
+print("serving at port", PORT)
+print("prueba")
 try:
-    serversocket.bind((hostname, PORT))
-    # become a server socket
-    # MAX_OPEN_REQUESTS connect requests before refusing outside connections
-    serversocket.listen(MAX_OPEN_REQUESTS)
+    httpd.serve_forever()
+except KeyboardInterrupt:
+        pass
 
-    while True:
-        # accept connections from outside
-        print ("Waiting for connections at %s %i" % (hostname, PORT))
-        (clientsocket, address) = serversocket.accept()
-        # now do something with the clientsocket
-        # in this case, we'll pretend this is a non threaded server
-        process_client(clientsocket)
+httpd.server_close()
+print("")
+print("Server stopped!")
 
-except socket.error:
-    print("Problemas using port %i. Do you have permission?" % PORT)
+
+# https://github.com/joshmaker/simple-python-webserver/blob/master/server.py
