@@ -157,7 +157,6 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     f.write(finish)
                 with open("listcompanies.html", "r") as f:
                     file = f.read()
-
                 self.wfile.write(bytes(file, "utf8"))
             elif "listWarnings" in self.path:
                 self.send_response(200)
