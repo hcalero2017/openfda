@@ -9,7 +9,7 @@ IP = "localhost"  # Localhost means "I": your local machine
 PORT = 8000
 socketserver.TCPServer.allow_reuse_adress = True
 
-
+noexist = "unknown"
 # HTTPRequestHandler class
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET
@@ -52,13 +52,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         listdrugsearch.append(drugs_1['results'][x]['active_ingredient'][0])
                     else:
                         listdrugsearch.append("This index has no drug")
-                with open("drugsearch.html", "w") as f:
+                with open("practice.html", "w") as f:
                     f.write(start)
                     for element in listdrugsearch:
                         htmlelement = "<li>" + element + "</li>" + "\n"
                         f.write(htmlelement)
                     f.write(finish)
-                with open("drugsearch.html", "r") as f:
+                with open("practice.html", "r") as f:
                     file = f.read()
 
                 self.wfile.write(bytes(file, "utf8"))
@@ -67,7 +67,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listcompanysearch=[]
+                list=[]
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 companyname = self.path.split("?")[1]
@@ -81,16 +81,16 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 for x in range(len(companies_1['results'])):
                     if 'active_ingredient' in companies_1['results'][x]:
-                        listcompanysearch.append(companies_1['results'][x]['openfda']["manufacturer_name"][0])
+                        list.append(companies_1['results'][x]['openfda']["manufacturer_name"][0])
                     else:
-                        listcompanysearch.append("This index has no manufacturer name")
-                with open("companysearch.html", "w") as f:
+                        list.append("This index has no manufacturer name")
+                with open("practice.html", "w") as f:
                     f.write(start)
-                    for element in listcompanysearch:
+                    for element in list:
                         htmlelement = "<li>" + element + "</li>" + "\n"
                         f.write(htmlelement)
                     f.write(finish)
-                with open("companysearch.html", "r") as f:
+                with open("practice.html", "r") as f:
                     file = f.read()
 
                 self.wfile.write(bytes(file, "utf8"))
@@ -99,12 +99,14 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listdruglist = []
+                list=[]
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
-                parameters = self.path.split("?")[1]
-                limit = parameters.split("?")[1]
-                url = "/drug/label.json?" + limit
+                drug = self.path.split("?")[1]
+                limit = drug.split("=")[1]
+                print(drug)
+                url = "/drug/label.json?" +"limit=" + limit
+                print(url)
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
                 drugs_raw = r1.read().decode("utf-8")
@@ -113,15 +115,20 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 drugs_1 = drug
 
                 for x in range(len(drugs_1['results'])):
-                    if "openfda" in drugs_1["results"][x]:
-                        listdruglist.append(drugs_1['results'][x]['openfda']["brand_name"][0])
-                with open("listdrugs.html", "w") as f:
+                    try:
+                        if "openfda" in drugs_1["results"][x]:
+                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                    except KeyError:
+                        list.append("Unknown")
+
+
+                with open("practice.html", "w") as f:
                     f.write(start)
-                    for element in listdruglist:
+                    for element in list:
                         htmlelement = "<li>" + element + "</li>" + "\n"
                         f.write(htmlelement)
                     f.write(finish)
-                with open("listdrugs.html", "r") as f:
+                with open("practice.html", "r") as f:
                     file = f.read()
 
                 self.wfile.write(bytes(file, "utf8"))
@@ -130,7 +137,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listcompanylist = []
+                list = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
@@ -145,25 +152,24 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 for x in range(len(drugs_1['results'])):
                     if "openfda" in drugs_1["results"][x]:
-                        listcompanylist.append(drugs_1['results'][x]['openfda']["manufacturer_name"][0])
+                        list.append(drugs_1['results'][x]['openfda']["manufacturer_name"][0])
                     else:
-                        listcompanylist.append("Unknow")
+                        list.append("Unknow")
 
-                with open("listcompanies.html", "w") as f:
+                with open("practice.html", "w") as f:
                     f.write(start)
-                    for element in listcompanylist:
+                    for element in list:
                         htmlelement = "<li>" + element + "</li>" + "\n"
                         f.write(htmlelement)
                     f.write(finish)
-                with open("listcompanies.html", "r") as f:
+                with open("practice.html", "r") as f:
                     file = f.read()
                 self.wfile.write(bytes(file, "utf8"))
-
             elif "listWarnings" in self.path:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listwarninglist = []
+                list = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
@@ -178,33 +184,33 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 for x in range(len(drugs_1['results'])):
                     if "openfda" in drugs_1["results"][x]:
-                        listwarninglist.append(drugs_1['results'][x]['warnings'][0])
+                        list.append(drugs_1['results'][x]['warnings'][0])
 
-                with open("listwarnings.html", "w") as f:
+                with open("practice.html", "w") as f:
                     f.write(start)
-                    for element in listwarninglist:
+                    for element in list:
                         htmlelement = "<li>" + element + "</li>" + "\n"
                         f.write(htmlelement)
                     f.write(finish)
-                with open("listwarnings.html", "r") as f:
+                with open("practice.html", "r") as f:
                     file = f.read()
 
                 self.wfile.write(bytes(file, "utf8"))
 
             elif "secret" in self.path:
                 self.send_response(401)
-                self.send_header("WWW-Authenticate", 'Basic realm = "OpenFDA Private Zone"')
+                self.send_header('WWW-Authenticate', 'Basic Realm = "OpenFDA Private Zone"')
                 self.end_headers()
 
             elif "redirect" in self.path:
                 self.send_response(302)
-                self.send_header('Location', 'http://localhost:8000')
+                self.send_header('Location', 'http://localhost:8000/')
                 self.end_headers()
 
 
 
 
-        except KeyError:
+        except KeyError as ex:
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
