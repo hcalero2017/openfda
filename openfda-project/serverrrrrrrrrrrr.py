@@ -9,7 +9,7 @@ IP = "localhost"  # Localhost means "I": your local machine
 PORT = 8000
 socketserver.TCPServer.allow_reuse_adress = True
 
-
+noexist = "unknown"
 # HTTPRequestHandler class
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET
@@ -99,12 +99,14 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listdruglist = []
+                listdruglist=[]
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
-                parameters = self.path.split("?")[1]
-                limit = parameters.split("?")[1]
-                url = "/drug/label.json?" + limit
+                drug = self.path.split("?")[1]
+                limit = drug.split("=")[1]
+                print(drug)
+                url = "/drug/label.json?" +"limit=" + limit
+                print(url)
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
                 drugs_raw = r1.read().decode("utf-8")
@@ -113,8 +115,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 drugs_1 = drug
 
                 for x in range(len(drugs_1['results'])):
-                    if "openfda" in drugs_1["results"][x]:
-                        listdruglist.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                    try:
+                        if "openfda" in drugs_1["results"][x]:
+                            listdruglist.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                    except KeyError:
+                        listdruglist.append("Unknown")
+
+
                 with open("listdrugs.html", "w") as f:
                     f.write(start)
                     for element in listdruglist:
@@ -158,7 +165,6 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 with open("listcompanies.html", "r") as f:
                     file = f.read()
                 self.wfile.write(bytes(file, "utf8"))
-
             elif "listWarnings" in self.path:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
@@ -193,18 +199,18 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
             elif "secret" in self.path:
                 self.send_response(401)
-                self.send_header("WWW-Authenticate", 'Basic realm = "OpenFDA Private Zone"')
+                self.send_header('WWW-Authenticate', 'Basic Realm = "OpenFDA Private Zone"')
                 self.end_headers()
 
             elif "redirect" in self.path:
                 self.send_response(302)
-                self.send_header('Location', 'http://localhost:8000')
+                self.send_header('Location', 'http://localhost:8000/')
                 self.end_headers()
 
 
 
 
-        except KeyError:
+        except KeyError as ex:
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
