@@ -10,11 +10,12 @@ PORT = 8000
 socketserver.TCPServer.allow_reuse_adress = True
 
 noexist = "unknown"
+
+
 # HTTPRequestHandler class
 class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET
     def do_GET(self):
-
 
         start = "<!doctype html>" + "\n" + "<html>" + "\n" + "<body>" + "\n" "<ul>" + "\n"
         finish = "</ul>" + "\n" + "</body>" + "\n" + "</html>"
@@ -32,7 +33,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                listdrugsearch=[]
+                listdrugsearch = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 parameters = self.path.split("?")[1]
@@ -63,15 +64,17 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 self.wfile.write(bytes(file, "utf8"))
 
-            elif "searchCompanies" in self.path:
+            elif "searchCompany" in self.path:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                list=[]
+                list = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
-                companyname = self.path.split("?")[1]
-                url = "/drug/label.json?search=manufacturer_name:" + companyname
+                parameters = self.path.split("?")[1]
+                companyname = parameters.split("&")[0].split("=")[1]
+                limit = parameters.split("&")[1].split("=")[1]
+                url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limit
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
                 company_raw = r1.read().decode("utf-8")
@@ -99,13 +102,13 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                list=[]
+                list = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
                 limit = drug.split("=")[1]
                 print(drug)
-                url = "/drug/label.json?" +"limit=" + limit
+                url = "/drug/label.json?" + "limit=" + limit
                 print(url)
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
@@ -120,7 +123,6 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                             list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
                     except KeyError:
                         list.append("Unknown")
-
 
                 with open("practice.html", "w") as f:
                     f.write(start)
@@ -141,8 +143,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
+                limit = drug.split("=")[1]
                 print(drug)
-                url = "/drug/label.json?" + drug
+                url = "/drug/label.json?" + "limit=" + limit
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
                 drugs_raw = r1.read().decode("utf-8")
@@ -151,10 +154,11 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 drugs_1 = drug
 
                 for x in range(len(drugs_1['results'])):
-                    if "openfda" in drugs_1["results"][x]:
-                        list.append(drugs_1['results'][x]['openfda']["manufacturer_name"][0])
-                    else:
-                        list.append("Unknow")
+                    try:
+                        if "openfda" in drugs_1["results"][x]:
+                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                    except KeyError:
+                        list.append("Unknown")
 
                 with open("practice.html", "w") as f:
                     f.write(start)
@@ -173,8 +177,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
+                limit = drug.split("=")[1]
                 print(drug)
-                url = "/drug/label.json?" + drug
+                url = "/drug/label.json?" + "limit=" + limit
                 conn.request("GET", url, None, headers)
                 r1 = conn.getresponse()
                 drugs_raw = r1.read().decode("utf-8")
@@ -183,8 +188,11 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 drugs_1 = drug
 
                 for x in range(len(drugs_1['results'])):
-                    if "openfda" in drugs_1["results"][x]:
-                        list.append(drugs_1['results'][x]['warnings'][0])
+                    try:
+                        if "openfda" in drugs_1["results"][x]:
+                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                    except KeyError:
+                        list.append("Unknown")
 
                 with open("practice.html", "w") as f:
                     f.write(start)
@@ -207,6 +215,14 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_header('Location', 'http://localhost:8000/')
                 self.end_headers()
 
+            else:
+                self.send_response(404)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                with open("error.html", "r") as f:
+                    file = f.read()
+                self.wfile.write(bytes(file, "utf8"))
+
 
 
 
@@ -214,14 +230,9 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            with open("error.html","r") as f:
+            with open("error.html", "r") as f:
                 file = f.read()
             self.wfile.write(bytes(file, "utf8"))
-
-
-
-
-
 
         return
 
@@ -235,7 +246,7 @@ print("prueba")
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
-        pass
+    pass
 
 httpd.server_close()
 print("")
