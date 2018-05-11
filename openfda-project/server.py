@@ -40,29 +40,58 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 drug = parameters.split("&")[0].split("=")[1]
                 limit = parameters.split("&")[1].split("=")[1]
                 print(drug)
-                url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limit
-                conn.request("GET", url, None, headers)
-                r1 = conn.getresponse()
-                drugs_raw = r1.read().decode("utf-8")
-                conn.close()
-                drug = json.loads(drugs_raw)
-                drugs_1 = drug
+                if limit == "":
+                    limite = "10"
+                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limite
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
 
-                for x in range(len(drugs_1['results'])):
-                    if 'active_ingredient' in drugs_1['results'][x]:
-                        listdrugsearch.append(drugs_1['results'][x]['active_ingredient'][0])
-                    else:
-                        listdrugsearch.append("This index has no drug")
-                with open("practice.html", "w") as f:
-                    f.write(start)
-                    for element in listdrugsearch:
-                        htmlelement = "<li>" + element + "</li>" + "\n"
-                        f.write(htmlelement)
-                    f.write(finish)
-                with open("practice.html", "r") as f:
-                    file = f.read()
+                    for x in range(len(drugs_1['results'])):
+                        if 'active_ingredient' in drugs_1['results'][x]:
+                            listdrugsearch.append(drugs_1['results'][x]['active_ingredient'][0])
+                        else:
+                            listdrugsearch.append("This index has no drug")
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in listdrugsearch:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
 
-                self.wfile.write(bytes(file, "utf8"))
+                    self.wfile.write(bytes(file, "utf8"))
+                else:
+                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limit
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
+
+                    for x in range(len(drugs_1['results'])):
+                        if 'active_ingredient' in drugs_1['results'][x]:
+                            listdrugsearch.append(drugs_1['results'][x]['active_ingredient'][0])
+                        else:
+                            listdrugsearch.append("This index has no drug")
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in listdrugsearch:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+
+                    self.wfile.write(bytes(file, "utf8"))
+
+
+
 
             elif "searchCompany" in self.path:
                 self.send_response(200)
@@ -74,29 +103,57 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 parameters = self.path.split("?")[1]
                 companyname = parameters.split("&")[0].split("=")[1]
                 limit = parameters.split("&")[1].split("=")[1]
-                url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limit
-                conn.request("GET", url, None, headers)
-                r1 = conn.getresponse()
-                company_raw = r1.read().decode("utf-8")
-                conn.close()
-                companyname = json.loads(company_raw)
-                companies_1 = companyname
 
-                for x in range(len(companies_1['results'])):
-                    if 'active_ingredient' in companies_1['results'][x]:
-                        list.append(companies_1['results'][x]['openfda']["manufacturer_name"][0])
-                    else:
-                        list.append("This index has no manufacturer name")
-                with open("practice.html", "w") as f:
-                    f.write(start)
-                    for element in list:
-                        htmlelement = "<li>" + element + "</li>" + "\n"
-                        f.write(htmlelement)
-                    f.write(finish)
-                with open("practice.html", "r") as f:
-                    file = f.read()
+                if limit == "":
+                    limite = "10"
+                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limite
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    company_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    companyname = json.loads(company_raw)
+                    companies_1 = companyname
 
-                self.wfile.write(bytes(file, "utf8"))
+                    for x in range(len(companies_1['results'])):
+                        if 'active_ingredient' in companies_1['results'][x]:
+                            list.append(companies_1['results'][x]['openfda']["manufacturer_name"][0])
+                        else:
+                            list.append("This index has no manufacturer name")
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+
+                    self.wfile.write(bytes(file, "utf8"))
+                else:
+                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limit
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    company_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    companyname = json.loads(company_raw)
+                    companies_1 = companyname
+
+                    for x in range(len(companies_1['results'])):
+                        if 'active_ingredient' in companies_1['results'][x]:
+                            list.append(companies_1['results'][x]['openfda']["manufacturer_name"][0])
+                        else:
+                            list.append("This index has no manufacturer name")
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+
+                    self.wfile.write(bytes(file, "utf8"))
+
 
             elif "listDrugs" in self.path:
                 self.send_response(200)
@@ -107,33 +164,62 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
                 limit = drug.split("=")[1]
-                print(drug)
-                url = "/drug/label.json?" + "limit=" + limit
-                print(url)
-                conn.request("GET", url, None, headers)
-                r1 = conn.getresponse()
-                drugs_raw = r1.read().decode("utf-8")
-                conn.close()
-                drug = json.loads(drugs_raw)
-                drugs_1 = drug
+                if limit == "":
+                    limite = "10"
+                    url = "/drug/label.json?" + "limit=" + limite
+                    print(url)
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
 
-                for x in range(len(drugs_1['results'])):
-                    try:
-                        if "openfda" in drugs_1["results"][x]:
-                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
-                    except KeyError:
-                        list.append("Unknown")
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "openfda" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                        except KeyError:
+                            list.append("Unknown")
 
-                with open("practice.html", "w") as f:
-                    f.write(start)
-                    for element in list:
-                        htmlelement = "<li>" + element + "</li>" + "\n"
-                        f.write(htmlelement)
-                    f.write(finish)
-                with open("practice.html", "r") as f:
-                    file = f.read()
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
 
-                self.wfile.write(bytes(file, "utf8"))
+                    self.wfile.write(bytes(file, "utf8"))
+                else:
+                    url = "/drug/label.json?" + "limit=" + limit
+                    print(url)
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
+
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "openfda" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
+                        except KeyError:
+                            list.append("Unknown")
+
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+
+                    self.wfile.write(bytes(file, "utf8"))
+
 
             elif "listCompanies" in self.path:
                 self.send_response(200)
@@ -144,31 +230,59 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
                 limit = drug.split("=")[1]
-                print(drug)
-                url = "/drug/label.json?" + "limit=" + limit
-                conn.request("GET", url, None, headers)
-                r1 = conn.getresponse()
-                drugs_raw = r1.read().decode("utf-8")
-                conn.close()
-                drug = json.loads(drugs_raw)
-                drugs_1 = drug
+                if limit == "":
+                    limite = "10"
+                    url = "/drug/label.json?" + "limit=" + limite
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
 
-                for x in range(len(drugs_1['results'])):
-                    try:
-                        if "openfda" in drugs_1["results"][x]:
-                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
-                    except KeyError:
-                        list.append("Unknown")
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "openfda" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]['openfda']["manufacturer_name"][0])
+                        except KeyError:
+                            list.append("Unknown")
 
-                with open("practice.html", "w") as f:
-                    f.write(start)
-                    for element in list:
-                        htmlelement = "<li>" + element + "</li>" + "\n"
-                        f.write(htmlelement)
-                    f.write(finish)
-                with open("practice.html", "r") as f:
-                    file = f.read()
-                self.wfile.write(bytes(file, "utf8"))
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+                    self.wfile.write(bytes(file, "utf8"))
+                else:
+                    url = "/drug/label.json?" + "limit=" + limit
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
+
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "openfda" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]['openfda']["manufacturer_name"][0])
+                        except KeyError:
+                            list.append("Unknown")
+
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+                    self.wfile.write(bytes(file, "utf8"))
+
+
             elif "listWarnings" in self.path:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
@@ -178,32 +292,60 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 conn = http.client.HTTPSConnection("api.fda.gov")
                 drug = self.path.split("?")[1]
                 limit = drug.split("=")[1]
-                print(drug)
-                url = "/drug/label.json?" + "limit=" + limit
-                conn.request("GET", url, None, headers)
-                r1 = conn.getresponse()
-                drugs_raw = r1.read().decode("utf-8")
-                conn.close()
-                drug = json.loads(drugs_raw)
-                drugs_1 = drug
+                if limit == "":
+                    limite = "10"
+                    url = "/drug/label.json?" + "limit=" + limite
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
 
-                for x in range(len(drugs_1['results'])):
-                    try:
-                        if "openfda" in drugs_1["results"][x]:
-                            list.append(drugs_1['results'][x]['openfda']["brand_name"][0])
-                    except KeyError:
-                        list.append("Unknown")
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "warnings" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]["warnings"][0])
+                        except KeyError:
+                            list.append("Unknown")
 
-                with open("practice.html", "w") as f:
-                    f.write(start)
-                    for element in list:
-                        htmlelement = "<li>" + element + "</li>" + "\n"
-                        f.write(htmlelement)
-                    f.write(finish)
-                with open("practice.html", "r") as f:
-                    file = f.read()
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
 
-                self.wfile.write(bytes(file, "utf8"))
+                    self.wfile.write(bytes(file, "utf8"))
+                else:
+                    url = "/drug/label.json?" + "limit=" + limit
+                    conn.request("GET", url, None, headers)
+                    r1 = conn.getresponse()
+                    drugs_raw = r1.read().decode("utf-8")
+                    conn.close()
+                    drug = json.loads(drugs_raw)
+                    drugs_1 = drug
+
+                    for x in range(len(drugs_1['results'])):
+                        try:
+                            if "openfda" in drugs_1["results"][x]:
+                                list.append(drugs_1['results'][x]["warnings"][0])
+                        except KeyError:
+                            list.append("Unknown")
+
+                    with open("practice.html", "w") as f:
+                        f.write(start)
+                        for element in list:
+                            htmlelement = "<li>" + element + "</li>" + "\n"
+                            f.write(htmlelement)
+                        f.write(finish)
+                    with open("practice.html", "r") as f:
+                        file = f.read()
+
+                    self.wfile.write(bytes(file, "utf8"))
+
 
             elif "secret" in self.path:
                 self.send_response(401)
@@ -242,7 +384,6 @@ Handler = testHTTPRequestHandler
 
 httpd = socketserver.TCPServer((IP, PORT), Handler)
 print("serving at port", PORT)
-print("prueba")
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
