@@ -36,13 +36,14 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 listdrugsearch = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
-                parameters = self.path.split("?")[1]
-                drug = parameters.split("&")[0].split("=")[1]
-                limit = parameters.split("&")[1].split("=")[1]
-                print(drug)
-                if limit == "":
-                    limite = "10"
-                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limite
+
+                if "&" in self.path:
+                    parameters = self.path.split("?")[1]
+                    drug = parameters.split("&")[0].split("=")[1]
+                    limit = parameters.split("&")[1].split("=")[1]
+                    if limit =="":
+                        limit = "10"
+                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limit
                     conn.request("GET", url, None, headers)
                     r1 = conn.getresponse()
                     drugs_raw = r1.read().decode("utf-8")
@@ -65,8 +66,12 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         file = f.read()
 
                     self.wfile.write(bytes(file, "utf8"))
+
                 else:
-                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limit
+                    limite = "10"
+                    parameters = self.path.split("?")[1]
+                    drug = parameters.split("&")[0].split("=")[1]
+                    url = "/drug/label.json?search=active_ingredient:" + drug + "&" + "limit=" + limite
                     conn.request("GET", url, None, headers)
                     r1 = conn.getresponse()
                     drugs_raw = r1.read().decode("utf-8")
@@ -100,13 +105,15 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 list = []
                 headers = {'User-Agent': 'http-client'}
                 conn = http.client.HTTPSConnection("api.fda.gov")
-                parameters = self.path.split("?")[1]
-                companyname = parameters.split("&")[0].split("=")[1]
-                limit = parameters.split("&")[1].split("=")[1]
 
-                if limit == "":
-                    limite = "10"
-                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limite
+
+                if "&" in self.path:
+                    parameters = self.path.split("?")[1]
+                    companyname = parameters.split("&")[0].split("=")[1]
+                    limit = parameters.split("&")[1].split("=")[1]
+                    if limit == "":
+                        limit = "10"
+                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limit
                     conn.request("GET", url, None, headers)
                     r1 = conn.getresponse()
                     company_raw = r1.read().decode("utf-8")
@@ -129,8 +136,12 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         file = f.read()
 
                     self.wfile.write(bytes(file, "utf8"))
+
                 else:
-                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limit
+                    parameters = self.path.split("?")[1]
+                    companyname = parameters.split("&")[0].split("=")[1]
+                    limite = "10"
+                    url = "/drug/label.json?search=manufacturer_name:" + companyname + "&" + "limit=" + limite
                     conn.request("GET", url, None, headers)
                     r1 = conn.getresponse()
                     company_raw = r1.read().decode("utf-8")
