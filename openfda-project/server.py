@@ -7,7 +7,7 @@ import socket
 # -- IP and the port of the server
 IP = "localhost"  # Localhost means "I": your local machine
 PORT = 8000
-socketserver.TCPServer.allow_reuse_adress = True
+socketserver.TCPServer.allow_reuse_address = True
 
 noexist = "unknown"
 
